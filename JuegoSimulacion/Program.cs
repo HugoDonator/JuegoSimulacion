@@ -50,5 +50,20 @@ namespace JuegoSimulacion
             return CultivosTotales;
         
         }
+        //Metodo para mostrar los resultados finales
+        static void MostrarResultado(List<Task<int>> parcelas) 
+        {
+            Console.WriteLine("\nResultados Finales: ");
+            int TotalCultivos = 0;
+
+            for (int i = 0; i < parcelas.Count; i++)
+            {
+                int cultivos = parcelas[i].Result;
+                TotalCultivos += cultivos;
+                Console.WriteLine($"Parcela {i + 1}: {cultivos} cultivos");
+            }
+
+            Console.WriteLine($"Total de cultivos Producidos por toda la parcela es {TotalCultivos} cultivos");
+        }
     }
 }
