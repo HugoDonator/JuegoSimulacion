@@ -15,7 +15,7 @@ namespace JuegoSimulacion
             List<Task<int>> parcelas = new List<Task<int>>();
             int Totalparcelas = 3;
 
-            for (int i = 0; i < Totalparcelas; i++)
+            for (int i = 1; i <=Totalparcelas; i++)
             {
                 parcelas.Add(SimularParcela(i));
             }
@@ -23,7 +23,13 @@ namespace JuegoSimulacion
             Task<int> PrimerParcela = Task.WhenAny(parcelas).Result;
             Console.WriteLine($"la primera parcela en terminar fue la parcela {parcelas.IndexOf(PrimerParcela) + 1}");
 
+            Console.WriteLine("Esperando que todas las parcelas completen sus fases...");
             await Task.WhenAll(parcelas);
+            Console.WriteLine("=========================================================");
+            Console.WriteLine("¡Todas las parcelas han terminado su cultivo!");
+            MostrarResultado(parcelas);
+            Console.WriteLine("FIN DE LA SIMULACION");
+            Console.ReadLine();
 
 
         }
@@ -34,7 +40,8 @@ namespace JuegoSimulacion
             Random random= new Random();
             int CultivosTotales = 0;
 
-            Console.WriteLine($"Parcela {id} inicia su cultivo");
+            Console.WriteLine($"Parcela {id} inicia su cultivo.....");
+            Console.WriteLine("=========================================================");
             for (int fase = 1; fase <= 3; fase++) 
             {
 
@@ -44,8 +51,9 @@ namespace JuegoSimulacion
                 int produccion = random.Next(5, 15);
                 CultivosTotales += produccion;
 
-                Console.WriteLine($"Parcela {id}: Fase{fase} completada. Cultivos producidos: {produccion}. Tiempo: {retraso} ms. ");
+                Console.WriteLine($"Parcela {id}: Fase {fase} completada. Cultivos producidos: {produccion}. (Tiempo: {retraso} ms.) ");
              }
+            
             Console.WriteLine($"Parcela {id} Termino su cultivos con {CultivosTotales} cultivos");
             return CultivosTotales;
         
