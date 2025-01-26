@@ -28,6 +28,27 @@ namespace JuegoSimulacion
 
         }
 
+        //Metodo para Simular una parcela
+        static async Task<int>SimularParcela(int id) 
+        {
+            Random random= new Random();
+            int CultivosTotales = 0;
+
+            Console.WriteLine($"Parcela {id} inicia su cultivo");
+            for (int fase = 1; fase <= 3; fase++) 
+            {
+
+                int retraso = random.Next(1000, 3000);
+                await Task.Delay(retraso);
+
+                int produccion = random.Next(5, 15);
+                CultivosTotales += produccion;
+
+                Console.WriteLine($"Parcela {id}: Fase{fase} completada. Cultivos producidos: {produccion}. Tiempo: {retraso} ms. ");
+             }
+            Console.WriteLine($"Parcela {id} Termino su cultivos con {CultivosTotales} cultivos");
+            return CultivosTotales;
         
+        }
     }
 }
