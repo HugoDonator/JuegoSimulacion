@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,50 +16,59 @@ namespace JuegoSimulacion
 
             List<Task<int>> parcelas = new List<Task<int>>();
             int Totalparcelas = 3;
+            Random random = new Random();
 
-            for (int i = 1; i <=Totalparcelas; i++)
+            for (int i = 1; i <= Totalparcelas; i++)
             {
-                parcelas.Add(SimularParcela(i));
+                int ParcelasId = i;
+
+                Task<int> parcela = Task.Factory.StartNew(() =>
+                {
+                    return SimularParcela(ParcelasId, random); 
+                }, TaskCreationOptions.AttachedToParent); ;
+
+                parcelas.Add(parcela);
             }
 
-            Task<int> PrimerParcela = Task.WhenAny(parcelas).Result;
-            Console.WriteLine($"la primera parcela en terminar fue la parcela {parcelas.IndexOf(PrimerParcela) + 1}");
+            Task<Task<int>> primeraParcela=Task.Factory.ContinueWhenAny(parcelas.ToArray(), t =>
+            {
+                Console.WriteLine($"¡La primera parcela en terminar fue la Parcela {parcelas.IndexOf(t) + 1}!");
+                return t;
+            });
 
-            Console.WriteLine("Esperando que todas las parcelas completen sus fases...");
             await Task.WhenAll(parcelas);
-            Console.WriteLine("=========================================================");
-            Console.WriteLine("¡Todas las parcelas han terminado su cultivo!");
-            MostrarResultado(parcelas);
-            Console.WriteLine("FIN DE LA SIMULACION");
-            Console.ReadLine();
 
+   
+
+            MostrarResultado(parcelas);
+            Console.WriteLine("FIN DE LA SIMULACION DE LA GRANJA");
+            Console.ReadLine();
 
         }
 
         //Metodo para Simular una parcela
-        static async Task<int>SimularParcela(int id) 
+        static  int SimularParcela(int id,Random random) 
         {
-            Random random= new Random();
-            int CultivosTotales = 0;
+        int CultivosTotales = 0;
+        Console.WriteLine($"Parcela {id} ha comenzado a cultivar.....");
+            Console.WriteLine("=================================================");
+        for (int fase=1; fase<=3;fase++)
+        {
+            int retraso = random.Next(1000, 3000);
+            Task.Delay(retraso).Wait();
 
-            Console.WriteLine($"Parcela {id} inicia su cultivo.....");
-            Console.WriteLine("=========================================================");
-            for (int fase = 1; fase <= 3; fase++) 
-            {
-
-                int retraso = random.Next(1000, 3000);
-                await Task.Delay(retraso);
-
-                int produccion = random.Next(5, 15);
-                CultivosTotales += produccion;
-
-                Console.WriteLine($"Parcela {id}: Fase {fase} completada. Cultivos producidos: {produccion}. (Tiempo: {retraso} ms.) ");
-             }
-            
-            Console.WriteLine($"Parcela {id} Termino su cultivos con {CultivosTotales} cultivos");
-            return CultivosTotales;
-        
+            int produccion = random.Next(5,15);
+            CultivosTotales += produccion;
+            Console.WriteLine($"Parcela {id} ha completado la fase {fase} y ha producido {produccion} cultivos. Tiempo: {retraso} ms.");
+                
         }
+
+        Console.WriteLine($"Parcela {id} ha Completado todas sus fases con  {CultivosTotales} cultivos.");
+        
+            return CultivosTotales;
+
+
+    }
         //Metodo para mostrar los resultados finales
         static void MostrarResultado(List<Task<int>> parcelas) 
         {
